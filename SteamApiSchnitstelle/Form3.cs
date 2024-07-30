@@ -19,7 +19,8 @@ namespace SteamApiSchnitstelle
 
         private string gameListUserId;
         private string gameListUserApiKey;
-        private string link = @"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=";
+        private string link = @"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key="; 
+        string usedUrlForName = "https://store.steampowered.com/api/appdetails?appids=";
         public fmGameList(string userId, string userApiKey)
         {
             InitializeComponent();
@@ -31,8 +32,7 @@ namespace SteamApiSchnitstelle
         }
 
         private async void GetGames()
-        {
-            
+        {     
             if (gameListUserApiKey != null && gameListUserApiKey != "" && gameListUserId != null && gameListUserId != "")
             {
                 await Console.Out.WriteLineAsync("Begining");
@@ -41,12 +41,14 @@ namespace SteamApiSchnitstelle
                 {
                     await Console.Out.WriteLineAsync("PrwToken");
                     JToken jToken = JObject.Parse(games)["response"];
-                    var amountofforloops = jToken["game_count"];
-                    rtbListOfGames.Text = jToken["games"]["appid"].ToString();
+                    int amountofforloops = (int)jToken["game_count"];
+                    for (int i = 1; i <= amountofforloops-1; i++)
+                    {
+                        var name = await client.GetStringAsync(usedUrlForName + jToken["games"][i]["appid"]);
+
+                    }
                 }
             }
         }
-
-    
     }
 }
