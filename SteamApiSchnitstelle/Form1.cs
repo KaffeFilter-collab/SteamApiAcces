@@ -7,21 +7,27 @@ using System.Linq;
 
 namespace SteamApiSchnitstelle
 {
-    public partial class Form1 : Form
+    public partial class FsStartpage : Form
     {
         private static readonly HttpClient client = new HttpClient();
-        //string usedUrl = "http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=230410&count=3&maxlength=300&format=json";
-        string usedUrlForName = "https://store.steampowered.com/api/appdetails?appids=";
-        int index;
 
+        string usedUrlForName = "https://store.steampowered.com/api/appdetails?appids=";
+        string usedURLForPlayerCount = "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=";
         string usedURLPartOne = "http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=";
-        string usedURLPartTwo = "&count=3&maxlength=300&format=json";
-        public int appID = 230410;  
-        public Form1()
+        string usedURLPartTwo = "&count=3&maxlength=3000&format=json";
+
+        int index;
+        private string appid;
+        public string userid;
+        public string userapikey;
+
+        public string AppId
+        {
+            get; set;
+        }
+        public FsStartpage()
         {
             InitializeComponent();
-            GetGameInfo();
-            Refresh();
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -57,37 +63,71 @@ namespace SteamApiSchnitstelle
             }
             Refresh();
             GetGameInfo();
-
+            
         }
 
         private async void Refresh()
         {
-            var json = await client.GetStringAsync(usedURLPartOne+appID+usedURLPartTwo);
-            Console.Out.WriteLine(json);
-            if (json != null)
+            if (appid !=null && appid != "")
             {
-                JToken updateItems = JObject.Parse(json)["appnews"]["newsitems"];
-                DateTimeOffset date = DateTimeOffset.FromUnixTimeSeconds((int)updateItems[index]["date"]);
-                lblDatum.Text = date.LocalDateTime.ToString();
-                lblTitle.Text = updateItems[index]["title"].ToString();
-                rbtcontent.Text = updateItems[index]["contents"].ToString();
+                var json = await client.GetStringAsync(usedURLPartOne + appid + usedURLPartTwo);
+                Console.Out.WriteLine(json);
+                if (json != null)
+                {
+                    JToken updateItems = JObject.Parse(json)["appnews"]["newsitems"];
+                    DateTimeOffset date = DateTimeOffset.FromUnixTimeSeconds((int)updateItems[index]["date"]);
+                    lblDatum.Text = date.LocalDateTime.ToString();
+                    lblTitle.Text = updateItems[index]["title"].ToString();
+                    rbtcontent.Text = updateItems[index]["contents"].ToString();
+
+                }
             }
         }
 
         private async void GetGameInfo()
         {
-            var gameInfo = await client.GetStringAsync(usedUrlForName + appID);
-            if (gameInfo != null)
+            if (appid != null && appid != "")
             {
-                JToken jToken = JObject.Parse(gameInfo)[appID.ToString()]["data"];
-                lblGameName.Text = jToken["name"].ToString();
+                var gameInfo = await client.GetStringAsync(usedUrlForName + appid);
+                if (gameInfo != null)
+                {
+                    JToken jToken = JObject.Parse(gameInfo)[appid.ToString()]["data"];
+                    lblGameName.Text = jToken["name"].ToString();
+                }
+                var playerCount = await client.GetStringAsync(usedURLForPlayerCount + appid);
+                    if(playerCount != null)
+                {
+                    JToken jtPlayerCounter = JObject.Parse(playerCount)["response"]["player_count"];
+                    lblPlayerCount.Text = "Playercount: "+jtPlayerCounter.ToString();
+                }
+
+               
             }
         }
 
         private void btnOpenSettings_Click(object sender, EventArgs e)
         {
-            fmSettings fs = new fmSettings(this);
+            fmSettings fs = new fmSettings();
+            fs.FormClosed += (s, evt) =>
+            {
+                appid = fs.settingsAppId;
+                userid = fs.settingsUserID;
+                userapikey = fs.settingsApiKey;
+                Console.WriteLine(appid);
+                if (appid != null)
+                {
+                    GetGameInfo();
+                    Refresh();
+                }
+            };
             fs.ShowDialog();
+        }
+
+        private void btnYourGames_Click(object sender, EventArgs e)
+        {
+           
+            fmGameList fm = new fmGameList(userid, userapikey);
+            fm.ShowDialog();
         }
     }
 }
