@@ -41,6 +41,16 @@ namespace SteamApiSchnitstelle
                 {
                     await Console.Out.WriteLineAsync("PrwToken");
                     JToken jToken = JObject.Parse(games)["response"];
+
+                    JArray games = (JArray)jToken["games"];
+
+                    foreach (JToken game in games)
+                    {
+                        var name = game["appid"];
+                    }
+
+
+
                     int amountofforloops = (int)jToken["game_count"];
                     for (int i = 1; i <= amountofforloops-1; i++)
                     {
