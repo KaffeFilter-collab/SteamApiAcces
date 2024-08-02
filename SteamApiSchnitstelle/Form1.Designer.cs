@@ -70,6 +70,7 @@
             // 
             // rbtcontent
             // 
+            this.rbtcontent.BackColor = System.Drawing.SystemColors.Control;
             this.rbtcontent.Location = new System.Drawing.Point(67, 142);
             this.rbtcontent.Name = "rbtcontent";
             this.rbtcontent.Size = new System.Drawing.Size(460, 238);
@@ -108,6 +109,7 @@
             // btnOpenSettings
             // 
             this.btnOpenSettings.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.btnOpenSettings.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnOpenSettings.Location = new System.Drawing.Point(544, 12);
             this.btnOpenSettings.Name = "btnOpenSettings";
             this.btnOpenSettings.Size = new System.Drawing.Size(75, 23);
@@ -139,6 +141,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(631, 570);
             this.Controls.Add(this.btnYourGames);
             this.Controls.Add(this.lblPlayerCount);
@@ -151,6 +154,7 @@
             this.Controls.Add(this.lblDatum);
             this.Controls.Add(this.btnRefresh);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MinimizeBox = false;
             this.Name = "FsStartpage";
             this.Text = "GameChecker";
             this.ResumeLayout(false);

@@ -21,6 +21,7 @@ namespace SteamApiSchnitstelle
         private string gameListUserApiKey;
         private string link = @"http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key="; 
         string usedUrlForName = "https://store.steampowered.com/api/appdetails?appids=";
+        string textforlistofgames;
         public fmGameList(string userId, string userApiKey)
         {
             InitializeComponent();
@@ -35,28 +36,28 @@ namespace SteamApiSchnitstelle
         {     
             if (gameListUserApiKey != null && gameListUserApiKey != "" && gameListUserId != null && gameListUserId != "")
             {
-                await Console.Out.WriteLineAsync("Begining");
-                var games = await client.GetStringAsync(link + gameListUserApiKey + "&steamid=" + gameListUserId + "&format=json");
-                if (games != null)
+                try
                 {
-                    await Console.Out.WriteLineAsync("PrwToken");
-                    JToken jToken = JObject.Parse(games)["response"];
-
-                    JArray games = (JArray)jToken["games"];
-
-                    foreach (JToken game in games)
+                    await Console.Out.WriteLineAsync("Begining");
+                    var games = await client.GetStringAsync(link + gameListUserApiKey + "&steamid=" + gameListUserId + "&include_appinfo=true&include_played_free_games=true&format=json");
+                    if (games != null)
                     {
-                        var name = game["appid"];
+                        await Console.Out.WriteLineAsync("PrwToken");
+                        JToken jToken = JObject.Parse(games)["response"];
+                        int amountofforloops = (int)jToken["game_count"];
+                        for (int i = 0; i <= amountofforloops - 1; i++)
+                        {
+                            JToken jTGameName = JObject.Parse(games)["response"]["games"];
+                            textforlistofgames = await client.GetStringAsync((string)link + jTGameName[i]["name"]) + textforlistofgames;
+                            await Console.Out.WriteLineAsync(textforlistofgames);
+                            await Console.Out.WriteLineAsync(textforlistofgames);
+                        }
+                        rtbListOfGames.Text = textforlistofgames;
                     }
-
-
-
-                    int amountofforloops = (int)jToken["game_count"];
-                    for (int i = 1; i <= amountofforloops-1; i++)
-                    {
-                        var name = await client.GetStringAsync(usedUrlForName + jToken["games"][i]["appid"]);
-
-                    }
+                } 
+                catch (HttpRequestException e)
+                {
+                    await Console.Out.WriteLineAsync("requestError" + e.Message);
                 }
             }
         }
